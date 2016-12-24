@@ -10,14 +10,14 @@ Vagrant.configure("2") do |config|
       fi
     SHELL
     host.vm.provision "ansible" do |ansible|
-      ansible.playbook = "playbook.yml"
+      ansible.playbook = "site.yml"
     end
   end
   # CentOS 7
   config.vm.define "centos-7", autostart: false do |host|
     host.vm.box = "centos/7"
     host.vm.provision "ansible" do |ansible|
-      ansible.playbook = "playbook.yml"
+      ansible.playbook = "site.yml"
     end
   end
 end
