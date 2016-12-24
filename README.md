@@ -13,3 +13,9 @@ vagrant up ubuntu-1604
 ```
 vagrant up centos-7
 ```
+
+### OpenBSD 6.0
+
+```
+vagrant up openbsd-60
+```

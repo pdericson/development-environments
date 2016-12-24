@@ -20,4 +20,14 @@ Vagrant.configure("2") do |config|
       ansible.playbook = "site.yml"
     end
   end
+  # OpenBSD 6.0
+  config.vm.define "openbsd-60", autostart: false do |host|
+    host.vm.box = "trombik/ansible-openbsd-6.0-amd64"
+    host.vm.provision "shell", inline: <<-SHELL
+      ln -s /usr/local/bin/python2.7 /usr/bin/python
+    SHELL
+    host.vm.provision "ansible" do |ansible|
+      ansible.playbook = "site.yml"
+    end
+  end
 end
