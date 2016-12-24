@@ -7,3 +7,9 @@ development environments
 ```
 vagrant up ubuntu-1604
 ```
+
+### CentOS 7
+
+```
+vagrant up centos-7
+```
