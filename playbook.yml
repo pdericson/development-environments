@@ -1,0 +1,4 @@
+---
+- hosts: ubuntu-1604
+  tasks:
+    - ping:
