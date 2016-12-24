@@ -1,7 +1,11 @@
 Vagrant.configure("2") do |config|
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 1024
+  end
   # Ubuntu 16.04
   config.vm.define "ubuntu-1604", autostart: false do |machine|
     machine.vm.box = "ubuntu/xenial64"
+    machine.vm.hostname = "ubuntu-1604"
     machine.vm.provision "shell", inline: <<-SHELL
       set -e
       if [ ! -x /usr/bin/python ]; then
@@ -16,6 +20,7 @@ Vagrant.configure("2") do |config|
   # CentOS 7
   config.vm.define "centos-7", autostart: false do |machine|
     machine.vm.box = "centos/7"
+    machine.vm.hostname = "centos-7"
     machine.vm.provision "ansible" do |ansible|
       ansible.playbook = "site.yml"
     end
@@ -23,6 +28,7 @@ Vagrant.configure("2") do |config|
   # OpenBSD 6.0
   config.vm.define "openbsd-60", autostart: false do |machine|
     machine.vm.box = "trombik/ansible-openbsd-6.0-amd64"
+    machine.vm.hostname = "openbsd-60"
     machine.vm.provision "shell", inline: <<-SHELL
       ln -s /usr/local/bin/python2.7 /usr/bin/python
     SHELL
