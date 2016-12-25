@@ -3,15 +3,17 @@
 development environments
 
 ```
-vagrant up ubuntu-1604
+vagrant up ubuntu-xenial
 vagrant up centos-7
-vagrant up openbsd-60
+vagrant up openbsd-6-0
+vagrant up debian-jessie
 ```
 
 ```
-vagrant ssh ubuntu-1604
+vagrant ssh ubuntu-xenial
 vagrant ssh centos-7
-vagrant ssh openbsd-60
+vagrant ssh openbsd-6-0
+vagrant ssh debian-jessie
 ```
 
 ```
