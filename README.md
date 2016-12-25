@@ -15,5 +15,9 @@ vagrant ssh openbsd-60
 ```
 
 ```
+ansible-playbook site.yml
+```
+
+```
 vagrant destroy -f
 ```
