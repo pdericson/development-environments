@@ -1,0 +1,4 @@
+---
+- hosts: ubuntu-xenial,openbsd-6-0
+  roles:
+    - postgresql

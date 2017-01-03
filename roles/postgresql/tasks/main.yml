@@ -1,0 +1,15 @@
+---
+- name: Install PostgreSQL on OpenBSD
+  openbsd_pkg: name={{ item }} state=present
+  with_items:
+    - postgresql-server
+    - postgresql-client
+    - postgresql-contrib
+  when: ansible_os_family == "OpenBSD"
+
+- name: Install PostgreSQL on Debian
+  apt: name={{ item }} state=present
+  with_items:
+    - postgresql
+    - postgresql-contrib
+  when: ansible_os_family == "Debian"
