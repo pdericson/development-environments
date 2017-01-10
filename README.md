@@ -23,3 +23,19 @@ ansible-playbook site.yml
 ```
 vagrant destroy -f
 ```
+
+## PostgreSQL
+
+```
+ansible-playbook -b postgresql.yml
+```
+
+```
+rake spec
+```
+
+Riemann:
+
+```
+rake spec SPEC_OPTS="--require ./riemann_formatter.rb --format RiemannFormatter"
+```
