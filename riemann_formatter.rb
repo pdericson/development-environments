@@ -1,3 +1,5 @@
+# rake spec SPEC_OPTS="--require ./riemann_formatter.rb --format RiemannFormatter"
+
 require 'riemann/client'
 
 class RiemannFormatter
