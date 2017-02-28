@@ -1,0 +1,10 @@
+---
+- name: install
+  apt: name=elasticsearch
+
+- name: update elasticsearch.yml
+  template: src=elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml
+  notify: restart elasticsearch
+
+- name: enable service
+  service: name=elasticsearch enabled=yes state=started

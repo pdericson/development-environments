@@ -1,0 +1,11 @@
+---
+- hosts: ubuntu-xenial,debian-jessie
+  roles:
+    - elastic
+    - filebeat
+
+- hosts: ubuntu-xenial
+  roles:
+    - jdk
+    - elasticsearch
+    - kibana

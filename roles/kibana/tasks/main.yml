@@ -1,0 +1,10 @@
+---
+- name: install
+  apt: name=kibana
+
+- name: update kibana.yml
+  template: src=kibana.yml.j2 dest=/etc/kibana/kibana.yml
+  notify: restart kibana
+
+- name: enable service
+  service: name=kibana enabled=yes state=started
