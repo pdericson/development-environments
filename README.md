@@ -39,3 +39,9 @@ Riemann:
 ```
 rake spec SPEC_OPTS="--require ./riemann_formatter.rb --format RiemannFormatter"
 ```
+
+Update Vagrant boxes:
+
+```
+vagrant box update
+```
