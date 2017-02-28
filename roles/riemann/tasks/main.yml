@@ -1,0 +1,13 @@
+---
+- name: download riemann
+  get_url:
+    url: https://github.com/riemann/riemann/releases/download/{{ riemann_version }}/riemann-{{ riemann_version }}.tar.bz2
+    dest: /usr/local/riemann-{{ riemann_version }}.tar.bz2
+    checksum: md5:046db627014898166b7f005f9e5c436f
+
+- name: unarchive riemann
+  unarchive:
+    src: /usr/local/riemann-{{ riemann_version }}.tar.bz2
+    dest: /usr/local/
+    creates: /usr/local/riemann-{{ riemann_version }}
+    remote_src: yes
