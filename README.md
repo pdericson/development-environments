@@ -45,3 +45,15 @@ Update Vagrant boxes:
 ```
 vagrant box update
 ```
+
+## libvirt
+
+<https://github.com/vagrant-libvirt/vagrant-libvirt#installation>
+
+```
+vagrant plugin install vagrant-libvirt
+```
+
+```
+export VAGRANT_DEFAULT_PROVIDER=libvirt
+```
