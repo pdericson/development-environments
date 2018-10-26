@@ -45,4 +45,19 @@ Vagrant.configure("2") do |config|
       ansible.playbook = "site.yml"
     end
   end
+  # Debian 9
+  (1..3).each do |i|
+    config.vm.define "debian-stretch-#{i}", autostart: false do |machine|
+      machine.vm.box = "debian/stretch64"
+      machine.vm.hostname = "debian-stretch-#{i}"
+      machine.vm.provider :libvirt do |domain|
+        domain.cpus = 2
+        domain.memory = 2048
+      end
+      machine.vm.provision "ansible" do |ansible|
+        ansible.playbook = "site.yml"
+      end
+      machine.vm.synced_folder './', '/vagrant', type: 'rsync'
+    end
+  end
 end
