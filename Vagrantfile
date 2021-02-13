@@ -66,14 +66,15 @@ Vagrant.configure("2") do |config|
       machine.vm.box = "debian/buster64"
       machine.vm.hostname = "debian-buster-#{i}"
       machine.vm.provider :libvirt do |domain|
-        domain.cpus = 2
-        domain.memory = 2048
+        domain.cpus = 4
+        domain.memory = 8192
       end
       machine.vm.provision "ansible" do |ansible|
         ansible.playbook = "site.yml"
       end
       machine.vm.synced_folder './', '/vagrant', type: 'rsync'
-      machine.vm.network "forwarded_port", guest: 6443, host: 6443 + (i - 1)
+      # virtualbox
+      # machine.vm.network "forwarded_port", guest: 6443, host: 6443 + (i - 1)
     end
   end
 end

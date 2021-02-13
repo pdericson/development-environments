@@ -64,6 +64,15 @@ vagrant box update
 ansible-playbook -b k3s.yml
 ```
 
+libvirt: Use the ip address of the virtual machine instead of 127.0.0.1:
+
+```
+ip_address=`vagrant ssh-config debian-buster-1 | grep HostName | awk '{print $NF}'`
+echo $ip_address
+sed -i "s/127.0.0.1:6443/$ip_address:6443/" ~/.kube/config
+chmod 600 ~/.kube/config
+```
+
 Install kubectl:
 
 ```
@@ -77,6 +86,62 @@ Install helm:
 ```
 curl -sfL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | sudo bash -
 ```
+
+## jenkins
+
+```
+helm repo add jenkins https://charts.jenkins.io
+helm repo update
+```
+
+```
+helm show values jenkins/jenkins > values.yaml
+```
+
+```
+cp values.yaml values.yaml.orig
+```
+
+```
+diff -u values.yaml.orig values.yaml
+```
+
+```
+--- values.yaml.orig	2021-02-14 12:32:13.596789747 +1300
++++ values.yaml	2021-02-14 12:32:57.681988754 +1300
+@@ -327,7 +327,7 @@
+   statefulSetAnnotations: {}
+
+   ingress:
+-    enabled: false
++    enabled: true
+     # Override for the default paths that map requests to the backend
+     paths: []
+     # - backend:
+@@ -569,7 +569,7 @@
+   # jenkins-agent: v1
+
+   # Executed command when side container gets started
+-  command:
++  command: jenkins-agent
+   args: "${computer.jnlpmac} ${computer.name}"
+   # Side container name
+   sideContainerName: "jnlp"
+@@ -770,4 +770,3 @@
+   #  drop:
+   #    - NET_RAW
+ checkDeprecation: true
+-
+```
+
+```
+kubectl create namespace jenkins
+```
+
+```
+helm -n jenkins install -f values.yaml jenkins jenkins/jenkins
+```
+
 
 ## libvirt
 
