@@ -108,7 +108,7 @@ diff -u values.yaml.orig values.yaml
 
 ```
 --- values.yaml.orig	2021-02-14 12:32:13.596789747 +1300
-+++ values.yaml	2021-02-14 12:32:57.681988754 +1300
++++ values.yaml	2021-02-14 23:26:08.386769999 +1300
 @@ -327,7 +327,7 @@
    statefulSetAnnotations: {}
 
@@ -127,6 +127,24 @@ diff -u values.yaml.orig values.yaml
    args: "${computer.jnlpmac} ${computer.name}"
    # Side container name
    sideContainerName: "jnlp"
+@@ -581,7 +581,7 @@
+   podName: "default"
+   # Allows the Pod to remain active for reuse until the configured number of
+   # minutes has passed since the last step was executed on it.
+-  idleMinutes: 0
++  idleMinutes: 10
+   # Raw yaml template for the Pod. For example this allows usage of toleration for agent pods.
+   # https://github.com/jenkinsci/kubernetes-plugin#using-yaml-to-define-pod-templates
+   # https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+@@ -650,7 +650,7 @@
+   ## A manually managed Persistent Volume and Claim
+   ## Requires persistence.enabled: true
+   ## If defined, PVC must be created manually before volume will be bound
+-  existingClaim:
++  existingClaim: jenkins
+   ## jenkins data Persistent Volume Storage Class
+   ## If defined, storageClassName: <storageClass>
+   ## If set to "-", storageClassName: "", which disables dynamic provisioning
 @@ -770,4 +770,3 @@
    #  drop:
    #    - NET_RAW
@@ -136,6 +154,22 @@ diff -u values.yaml.orig values.yaml
 
 ```
 kubectl create namespace jenkins
+```
+
+```
+kubectl -n jenkins apply -f - <<EOF
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+ name: jenkins
+spec:
+ # storageClassName: ""
+ accessModes:
+   - ReadWriteOnce
+ resources:
+   requests:
+     storage: 8Gi
+EOF
 ```
 
 ```
