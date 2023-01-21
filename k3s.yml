@@ -1,5 +1,5 @@
 ---
-- hosts: debian-buster-1
+- hosts: debian-bullseye-1
   roles:
     - k3s
     - helm

@@ -77,4 +77,19 @@ Vagrant.configure("2") do |config|
       # machine.vm.network "forwarded_port", guest: 6443, host: 6443 + (i - 1)
     end
   end
+  # Debian 11
+  (1..3).each do |i|
+    config.vm.define "debian-bullseye-#{i}", autostart: false do |machine|
+      machine.vm.box = "debian/bullseye64"
+      machine.vm.hostname = "debian-bullseye-#{i}"
+      machine.vm.provider :libvirt do |domain|
+        domain.cpus = 4
+        domain.memory = 8192
+      end
+      machine.vm.provision "ansible" do |ansible|
+        ansible.playbook = "site.yml"
+      end
+      machine.vm.synced_folder './', '/vagrant', type: 'rsync'
+    end
+  end
 end

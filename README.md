@@ -13,6 +13,9 @@ vagrant up debian-stretch-3
 vagrant up debian-buster-1
 vagrant up debian-buster-2
 vagrant up debian-buster-3
+vagrant up debian-bullseye-1
+vagrant up debian-bullseye-2
+vagrant up debian-bullseye-3
 ```
 
 ```
@@ -26,6 +29,9 @@ vagrant ssh debian-stretch-3
 vagrant ssh debian-buster-1
 vagrant ssh debian-buster-2
 vagrant ssh debian-buster-3
+vagrant ssh debian-bullseye-1
+vagrant ssh debian-bullseye-2
+vagrant ssh debian-bullseye-3
 ```
 
 ```
@@ -67,7 +73,7 @@ ansible-playbook -b k3s.yml
 libvirt: Use the ip address of the virtual machine instead of 127.0.0.1:
 
 ```
-ip_address=`vagrant ssh-config debian-buster-1 | grep HostName | awk '{print $NF}'`
+ip_address=`vagrant ssh-config debian-bullseye-1 | grep HostName | awk '{print $NF}'`
 echo $ip_address
 sed -i "s/127.0.0.1:6443/$ip_address:6443/" ~/.kube/config
 chmod 600 ~/.kube/config
