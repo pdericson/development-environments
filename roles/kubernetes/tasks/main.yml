@@ -1,0 +1,115 @@
+---
+- apt:
+    name: "{{ item }}"
+    cache_valid_time: 86400  # 24h
+  with_items:
+    - apt-transport-https
+    - curl
+
+- apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+- apt_repository:
+    repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+  register: apt_repository_result
+
+- apt:
+    update_cache: true
+  when: apt_repository_result.changed
+
+- apt:
+    name: "{{ item }}={{ kubernetes_version }}"
+  with_items:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+- dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  with_items:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+- modprobe:
+    name: br_netfilter
+
+- sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+
+- sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+
+- name: kubeadm init
+  shell:
+    kubeadm init --cri-socket /run/containerd/containerd.sock --pod-network-cidr 10.0.0.0/8
+    creates=/etc/kubernetes/admin.conf
+  when: init|default(false)
+
+- shell: |
+    mkdir -p $HOME/.kube
+    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+  become: true
+  become_user: vagrant
+  when: init|default(false)
+
+- shell: |
+    (
+    echo "apiVersion: v1"
+    echo "kind: ConfigMap"
+    echo "data:"
+    echo "  Corefile: |"
+    echo "    .:53 {"
+    echo "        errors"
+    echo "        health"
+    echo "        kubernetes cluster.local in-addr.arpa ip6.arpa {"
+    echo "           pods insecure"
+    echo "           upstream"
+    echo "           fallthrough in-addr.arpa ip6.arpa"
+    echo "        }"
+    echo "        prometheus :9153"
+    echo "        proxy . 8.8.8.8"
+    echo "        cache 30"
+    echo "        loop"
+    echo "        reload"
+    echo "        loadbalance"
+    echo "    }"
+    echo "metadata:"
+    echo "  name: coredns"
+    echo "  namespace: kube-system"
+    ) | kubectl apply -f -
+  become: true
+  become_user: vagrant
+  when: init|default(false)
+
+- shell: |
+    kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+    curl https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml | sed 's/192\.168\.0\.0\/16/10.0.0.0\/8/' | kubectl apply -f -
+  become: true
+  become_user: vagrant
+  when: init|default(false)
+
+- shell: |
+    kubeadm token create --print-join-command > /root/kubeadm-join-command
+    creates=/root/kubeadm-join-command
+  when: init|default(false)
+
+- fetch:
+    src: /root/kubeadm-join-command
+    dest: kubeadm-join-command
+    flat: true
+  when: init|default(false)
+
+- copy:
+    src: kubeadm-join-command
+    dest: /root/kubeadm-join-command
+  when: join|default(false)
+
+- name: kubeadm join
+  shell: |
+    $(cat /root/kubeadm-join-command) --cri-socket /run/containerd/containerd.sock
+  when: join|default(false)

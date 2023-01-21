@@ -1,0 +1,15 @@
+---
+- hosts: debian-stretch-*
+  roles:
+    - containerd
+    - kubernetes
+
+- hosts: debian-stretch-1
+  roles:
+    - role: kubernetes
+      init: true
+
+- hosts: debian-stretch-*:!debian-stretch-1
+  roles:
+    - role: kubernetes
+      join: true
