@@ -194,3 +194,23 @@ vagrant plugin install vagrant-libvirt
 ```
 export VAGRANT_DEFAULT_PROVIDER=libvirt
 ```
+
+
+## Vault
+
+```
+ansible-playbook -b vault.yml
+```
+
+vagrant ssh ...
+
+```
+export VAULT_SKIP_VERIFY=1
+vault operator init -key-shares=1 -key-threshold=1
+
+# Store "Unseal Key 1" and "Initial Root Token" somewhere safe.
+
+vault operator unseal  # Use "Unseal Key 1"
+
+vault login  # Use "Initial Root Token"
+```
