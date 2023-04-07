@@ -214,3 +214,24 @@ vault operator unseal  # Use "Unseal Key 1"
 
 vault login  # Use "Initial Root Token"
 ```
+
+## StackGres
+
+```
+vagrant up debian-bullseye-1
+ansible-playbook -b k3s.yml
+vagrant ssh debian-bullseye-1
+```
+
+https://stackgres.io/doc/latest/install/helm/
+
+```
+helm repo add stackgres-charts https://stackgres.io/downloads/stackgres-k8s/stackgres/helm/
+helm install --create-namespace --namespace stackgres stackgres-operator stackgres-charts/stackgres-operator
+```
+
+# ...
+
+```
+vagrant destroy -f debian-bullseye-1
+```

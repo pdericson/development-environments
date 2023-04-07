@@ -3,3 +3,4 @@
   roles:
     - k3s
     - helm
+    - stern

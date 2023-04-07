@@ -1,0 +1,6 @@
+---
+- name: install stern
+  shell: |
+    curl -sfL https://github.com/stern/stern/releases/download/v1.24.0/stern_1.24.0_linux_amd64.tar.gz | tar zxf - -C /usr/local/bin
+  args:
+    creates: /usr/local/bin/stern

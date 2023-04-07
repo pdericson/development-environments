@@ -4,4 +4,3 @@
     curl -sfL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash -
   args:
     creates: /usr/local/bin/helm
-    warn: false
