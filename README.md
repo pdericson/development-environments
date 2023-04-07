@@ -230,7 +230,7 @@ helm repo add stackgres-charts https://stackgres.io/downloads/stackgres-k8s/stac
 helm install --create-namespace --namespace stackgres stackgres-operator stackgres-charts/stackgres-operator
 ```
 
-# ...
+...
 
 ```
 vagrant destroy -f debian-bullseye-1
