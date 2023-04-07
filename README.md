@@ -112,7 +112,7 @@ cp values.yaml values.yaml.orig
 diff -u values.yaml.orig values.yaml
 ```
 
-```
+```diff
 --- values.yaml.orig	2021-02-14 12:32:13.596789747 +1300
 +++ values.yaml	2021-02-14 23:26:08.386769999 +1300
 @@ -327,7 +327,7 @@
