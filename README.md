@@ -223,6 +223,19 @@ ansible-playbook -b k3s.yml
 vagrant ssh debian-bullseye-1
 ```
 
+https://min.io/docs/minio/kubernetes/upstream/
+
+```
+curl -O https://raw.githubusercontent.com/minio/docs/master/source/extra/examples/minio-dev.yaml
+yq -i e 'select(.kind == "Pod").spec.nodeSelector."kubernetes.io/hostname" = "debian-bullseye-1"' minio-dev.yaml
+kubectl apply -f minio-dev.yaml
+kubectl -n minio-dev create service clusterip minio --tcp 9000 --tcp 9090
+```
+
+```
+stern -n minio-dev .
+```
+
 https://stackgres.io/doc/latest/install/helm/
 
 ```
@@ -235,13 +248,44 @@ stern -n stackgres .
 ```
 
 ```
-curl -O https://raw.githubusercontent.com/minio/docs/master/source/extra/examples/minio-dev.yaml
-yq -i e 'select(.kind == "Pod").spec.nodeSelector."kubernetes.io/hostname" = "debian-bullseye-1"' minio-dev.yaml
-kubectl apply -f minio-dev.yaml
+kubectl create namespace my-cluster
+cat << EOF | kubectl apply -f -
+apiVersion: stackgres.io/v1
+kind: SGInstanceProfile
+metadata:
+  namespace: my-cluster
+  name: size-small
+spec:
+  cpu: "2"
+  memory: "4Gi"
+EOF
 ```
 
+https://stackgres.io/doc/latest/reference/crd/sgobjectstorage/
+
 ```
-stern -n minio-dev .
+cat << EOF | kubectl apply -f -
+apiVersion: stackgres.io/v1beta1
+kind: SGObjectStorage
+metadata:
+  namespace: my-cluster
+  name: backupconfig1
+spec:
+  type: s3Compatible
+  s3Compatible:
+    bucket: stackgres
+    region: k8s
+    enablePathStyleAddressing: true
+    endpoint: http://minio.minio-dev:9000
+    awsCredentials:
+      secretKeySelectors:
+        accessKeyId:
+          key: accesskey
+          name: my-cluster-minio
+        secretAccessKey:
+          key: secretkey
+          name: my-cluster-minio
+EOF
 ```
 
 ...
