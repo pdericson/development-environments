@@ -230,6 +230,20 @@ helm repo add stackgres-charts https://stackgres.io/downloads/stackgres-k8s/stac
 helm install --create-namespace --namespace stackgres stackgres-operator stackgres-charts/stackgres-operator
 ```
 
+```
+stern -n stackgres .
+```
+
+```
+curl -O https://raw.githubusercontent.com/minio/docs/master/source/extra/examples/minio-dev.yaml
+yq -i e 'select(.kind == "Pod").spec.nodeSelector."kubernetes.io/hostname" = "debian-bullseye-1"' minio-dev.yaml
+kubectl apply -f minio-dev.yaml
+```
+
+```
+stern -n minio-dev .
+```
+
 ...
 
 ```

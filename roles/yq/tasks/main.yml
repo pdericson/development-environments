@@ -1,0 +1,12 @@
+---
+- name: install yq
+  shell: |
+    curl -sfL https://github.com/mikefarah/yq/releases/download/v{{ yq_version }}/yq_linux_amd64.tar.gz | tar zxf - -C /usr/local/bin
+  args:
+    creates: /usr/local/bin/yq_linux_amd64
+
+- name: create symlink
+  file:
+    src: /usr/local/bin/yq_linux_amd64
+    dest: /usr/local/bin/yq
+    state: link
