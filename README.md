@@ -229,11 +229,25 @@ https://min.io/docs/minio/kubernetes/upstream/
 curl -O https://raw.githubusercontent.com/minio/docs/master/source/extra/examples/minio-dev.yaml
 yq -i e 'select(.kind == "Pod").spec.nodeSelector."kubernetes.io/hostname" = "debian-bullseye-1"' minio-dev.yaml
 kubectl apply -f minio-dev.yaml
-kubectl -n minio-dev create service clusterip minio --tcp 9000 --tcp 9090
+kubectl -n minio-dev create service loadbalancer minio --tcp 9000 --tcp 9090
 ```
 
 ```
 stern -n minio-dev .
+```
+
+```
+sudo curl https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/local/bin/mc
+sudo chmod +x /usr/local/bin/mc
+```
+
+```
+mc alias set k8s-minio-dev http://127.0.0.1:9000 minioadmin minioadmin
+mc admin info k8s-minio-dev
+```
+
+```
+mc mb k8s-minio-dev/stackgres
 ```
 
 https://stackgres.io/doc/latest/install/helm/
@@ -256,14 +270,15 @@ metadata:
   namespace: my-cluster
   name: size-small
 spec:
-  cpu: "2"
-  memory: "4Gi"
+  cpu: "1"
+  memory: "2Gi"
 EOF
 ```
 
 https://stackgres.io/doc/latest/reference/crd/sgobjectstorage/
 
 ```
+kubectl -n my-cluster create secret generic my-cluster-minio --from-literal=accesskey=minioadmin --from-literal=secretkey=minioadmin
 cat << EOF | kubectl apply -f -
 apiVersion: stackgres.io/v1beta1
 kind: SGObjectStorage
@@ -288,7 +303,35 @@ spec:
 EOF
 ```
 
-...
+```
+cat << EOF | kubectl apply -f -
+apiVersion: stackgres.io/v1
+kind: SGCluster
+metadata:
+  namespace: my-cluster
+  name: cluster
+spec:
+  postgres:
+    version: '13.8'
+  instances: 1
+  sgInstanceProfile: 'size-small'
+  pods:
+    persistentVolume:
+      size: '10Gi'
+  configurations:
+    # sgPostgresConfig: 'pgconfig1'
+    # sgPoolingConfig: 'poolconfig1'
+    backups:
+    - sgObjectStorage: 'backupconfig1'
+      cronSchedule: '*/5 * * * *'
+      retention: 6
+  prometheusAutobind: true
+EOF
+```
+
+```
+stern -n my-cluster .
+```
 
 ```
 vagrant destroy -f debian-bullseye-1
