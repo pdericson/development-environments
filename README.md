@@ -229,6 +229,7 @@ https://min.io/docs/minio/kubernetes/upstream/
 curl -O https://raw.githubusercontent.com/minio/docs/master/source/extra/examples/minio-dev.yaml
 yq -i e 'select(.kind == "Pod").spec.nodeSelector."kubernetes.io/hostname" = "debian-bullseye-1"' minio-dev.yaml
 kubectl apply -f minio-dev.yaml
+# clusterip
 kubectl -n minio-dev create service loadbalancer minio --tcp 9000 --tcp 9090
 ```
 
@@ -303,6 +304,8 @@ spec:
 EOF
 ```
 
+### Test 1
+
 ```
 cat << EOF | kubectl apply -f -
 apiVersion: stackgres.io/v1
@@ -331,6 +334,95 @@ EOF
 
 ```
 stern -n my-cluster .
+```
+
+### Test 2
+
+```
+kubectl -n my-cluster get sgbackups
+
+name=...
+
+kubectl -n my-cluster delete sgcluster cluster --wait
+
+cat << EOF | kubectl apply -f -
+apiVersion: stackgres.io/v1
+kind: SGCluster
+metadata:
+  namespace: my-cluster
+  name: cluster
+spec:
+  postgres:
+    version: '13.8'
+  instances: 1
+  sgInstanceProfile: 'size-small'
+  pods:
+    persistentVolume:
+      size: '10Gi'
+  configurations:
+    # sgPostgresConfig: 'pgconfig1'
+    # sgPoolingConfig: 'poolconfig1'
+    backups:
+    - sgObjectStorage: 'backupconfig1'
+      cronSchedule: '*/5 * * * *'
+      retention: 6
+  prometheusAutobind: true
+  initialData:
+    restore:
+      fromBackup:
+        name: $name
+EOF
+```
+
+### Test 3
+
+```
+cat << EOF | kubectl apply -f -
+apiVersion: stackgres.io/v1
+kind: SGBackup
+metadata:
+  namespace: my-cluster
+  name: backup
+spec:
+  sgCluster: cluster
+  managedLifecycle: false
+EOF
+
+watch kubectl -n my-cluster get sgbackups
+```
+
+```
+name=backup
+
+kubectl -n my-cluster delete sgcluster cluster --wait
+
+cat << EOF | kubectl apply -f -
+apiVersion: stackgres.io/v1
+kind: SGCluster
+metadata:
+  namespace: my-cluster
+  name: cluster
+spec:
+  postgres:
+    version: '13.8'
+  instances: 1
+  sgInstanceProfile: 'size-small'
+  pods:
+    persistentVolume:
+      size: '10Gi'
+  configurations:
+    # sgPostgresConfig: 'pgconfig1'
+    # sgPoolingConfig: 'poolconfig1'
+    backups:
+    - sgObjectStorage: 'backupconfig1'
+      cronSchedule: '*/5 * * * *'
+      retention: 6
+  prometheusAutobind: true
+  initialData:
+    restore:
+      fromBackup:
+        name: $name
+EOF
 ```
 
 ```
