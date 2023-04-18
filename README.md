@@ -321,6 +321,31 @@ spec:
   pods:
     persistentVolume:
       size: '10Gi'
+  prometheusAutobind: true
+EOF
+```
+
+```
+stern -n my-cluster .
+```
+
+### Test 2
+
+```
+cat << EOF | kubectl apply -f -
+apiVersion: stackgres.io/v1
+kind: SGCluster
+metadata:
+  namespace: my-cluster
+  name: cluster
+spec:
+  postgres:
+    version: '13.8'
+  instances: 1
+  sgInstanceProfile: 'size-small'
+  pods:
+    persistentVolume:
+      size: '10Gi'
   configurations:
     # sgPostgresConfig: 'pgconfig1'
     # sgPoolingConfig: 'poolconfig1'
@@ -336,7 +361,7 @@ EOF
 stern -n my-cluster .
 ```
 
-### Test 2
+### Test 3
 
 ```
 kubectl -n my-cluster get sgbackups
@@ -374,7 +399,7 @@ spec:
 EOF
 ```
 
-### Test 3
+### Test 4
 
 ```
 cat << EOF | kubectl apply -f -
