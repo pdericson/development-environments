@@ -92,4 +92,19 @@ Vagrant.configure("2") do |config|
       machine.vm.synced_folder './', '/vagrant', type: 'rsync'
     end
   end
+  # Vault
+  (1..3).each do |i|
+    config.vm.define "vault-#{i}", autostart: false do |machine|
+      machine.vm.box = "debian/bullseye64"
+      machine.vm.hostname = "vault-#{i}"
+      machine.vm.provider :libvirt do |domain|
+        domain.cpus = 2
+        domain.memory = 2048
+      end
+      machine.vm.provision "ansible" do |ansible|
+        ansible.playbook = "site.yml"
+      end
+      machine.vm.synced_folder './', '/vagrant', type: 'rsync'
+    end
+  end
 end

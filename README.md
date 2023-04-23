@@ -215,6 +215,68 @@ vault operator unseal  # Use "Unseal Key 1"
 vault login  # Use "Initial Root Token"
 ```
 
+## Vault HA - WIP
+
+Work in progress, this isn't working yet!
+
+```
+vagrant up vault-1
+vagrant up vault-2
+vagrant up vault-3
+ansible-playbook -b vault-ha.yml
+```
+
+vagrant ssh vault-1
+
+```
+export VAULT_ADDR=http://127.0.0.1:8200
+
+vault operator init -key-shares=1 -key-threshold=1
+
+# Store "Unseal Key 1" and "Initial Root Token" somewhere safe.
+
+vault operator unseal  # Use "Unseal Key 1"
+
+vault login  # Use "Initial Root Token"
+
+vault operator raft list-peers
+```
+
+vagrant ssh vault-2
+
+```
+export VAULT_ADDR=http://127.0.0.1:8200
+
+vault operator init -key-shares=1 -key-threshold=1
+
+# Store "Unseal Key 1" and "Initial Root Token" somewhere safe.
+
+vault operator unseal  # Use "Unseal Key 1"
+
+vault login  # Use "Initial Root Token"
+
+vault operator raft list-peers
+
+# Copy from output for vault-1 above
+export ip_address=...
+
+vault operator raft join http://$ip_address:8201
+
+vault operator raft list-peers
+```
+
+vagrant ssh vault-3
+
+```
+# ...
+```
+
+```
+vagrant destroy -f vault-1
+vagrant destroy -f vault-2
+vagrant destroy -f vault-3
+```
+
 ## StackGres
 
 ```

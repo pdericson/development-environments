@@ -1,0 +1,36 @@
+---
+- name: install gpg
+  apt:
+    name: gpg
+    cache_valid_time: 86400  # 24h
+
+# https://developer.hashicorp.com/vault/downloads
+
+- name: install vault
+  shell: |
+    wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+    sudo apt update && sudo apt install vault
+  args:
+    creates: /usr/bin/vault
+
+- template:
+    src: vault.hcl.j2
+    dest: /etc/vault.d/vault.hcl
+
+- name: start vault
+  systemd:
+    name: vault
+    state: started
+    enabled: yes
+
+- name: vault status
+  shell: |
+    export VAULT_ADDR=http://127.0.0.1:8200
+    vault status
+  register: vault_status
+  failed_when: vault_status.rc == 1
+
+- name: debug vault status
+  debug:
+    var: vault_status.stdout_lines
