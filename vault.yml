@@ -1,4 +1,5 @@
 ---
 - hosts: debian-bullseye-1
+  serial: 1
   roles:
     - vault

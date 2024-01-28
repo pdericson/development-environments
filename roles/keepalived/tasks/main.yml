@@ -1,0 +1,10 @@
+- name: install keepalived
+  apt:
+    name: keepalived
+    cache_valid_time: 86400  # 24h
+
+- name: create /etc/keepalived/keepalived.conf
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  notify: restart keepalived

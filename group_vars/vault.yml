@@ -1,0 +1,4 @@
+keepalived_virtual_router_id: 51
+keepalived_authentication_auth_pass: boo1Aebu
+keepalived_virtual_ipaddress:
+  - 192.168.50.201/24

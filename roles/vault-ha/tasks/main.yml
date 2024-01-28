@@ -14,9 +14,11 @@
   args:
     creates: /usr/bin/vault
 
-- template:
+- name: create /etc/vault.d/vault.hcl
+  template:
     src: vault.hcl.j2
     dest: /etc/vault.d/vault.hcl
+  notify: restart vault
 
 - name: start vault
   systemd:
@@ -24,13 +26,7 @@
     state: started
     enabled: yes
 
-- name: vault status
-  shell: |
-    export VAULT_ADDR=http://127.0.0.1:8200
-    vault status
-  register: vault_status
-  failed_when: vault_status.rc == 1
-
-- name: debug vault status
-  debug:
-    var: vault_status.stdout_lines
+- name: create /etc/profile.d/vault.sh
+  template:
+    src: vault.sh.j2
+    dest: /etc/profile.d/vault.sh

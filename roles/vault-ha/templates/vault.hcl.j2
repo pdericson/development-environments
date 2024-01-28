@@ -9,8 +9,8 @@ storage "raft" {
   path = "/opt/vault/data"
   node_id = "{{ inventory_hostname }}"
 }
-cluster_addr = "http://{{ ansible_eth0.ipv4.address }}:8201"
-api_addr = "http://{{ ansible_eth0.ipv4.address }}:8200"
+cluster_addr = "http://{{ ansible_eth1.ipv4.address }}:8201"
+api_addr = "http://{{ ansible_eth1.ipv4.address }}:8200"
 
 #storage "consul" {
 #  address = "127.0.0.1:8500"
@@ -18,18 +18,18 @@ api_addr = "http://{{ ansible_eth0.ipv4.address }}:8200"
 #}
 
 # HTTP listener
-listener "tcp" {
-  address = "[::]:8200"
-  cluster_address = "[::]:8201"
-  tls_disable = 1
-}
+#listener "tcp" {
+#  address = "127.0.0.1:8200"
+#  tls_disable = 1
+#}
 
 # HTTPS listener
-#listener "tcp" {
-#  address       = "0.0.0.0:8200"
-#  tls_cert_file = "/opt/vault/tls/tls.crt"
-#  tls_key_file  = "/opt/vault/tls/tls.key"
-#}
+listener "tcp" {
+  address       = "0.0.0.0:8200"
+  cluster_addr  = "0.0.0.0:8201"
+  tls_cert_file = "/opt/vault/tls/tls.crt"
+  tls_key_file  = "/opt/vault/tls/tls.key"
+}
 
 # Enterprise license_path
 # This will be required for enterprise as of v1.8

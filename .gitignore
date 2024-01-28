@@ -5,3 +5,4 @@
 
 # kubernetes
 /kubeadm-join-command
+/.venv/

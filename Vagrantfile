@@ -103,8 +103,12 @@ Vagrant.configure("2") do |config|
       end
       machine.vm.provision "ansible" do |ansible|
         ansible.playbook = "site.yml"
+        ansible.groups = {
+          "vault" => ["vault-1", "vault-2", "vault-3"]
+        }
       end
       machine.vm.synced_folder './', '/vagrant', type: 'rsync'
+      machine.vm.network "private_network", ip: "192.168.50.10#{i}"
     end
   end
 end

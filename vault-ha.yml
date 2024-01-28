@@ -1,4 +1,5 @@
 ---
 - hosts: vault-1,vault-2,vault-3
   roles:
+    - keepalived
     - vault-ha
