@@ -6,3 +6,4 @@
 # kubernetes
 /kubeadm-join-command
 /.venv/
+/vault-?/
