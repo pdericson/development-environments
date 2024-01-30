@@ -3,6 +3,18 @@
     name: keepalived
     cache_valid_time: 86400  # 24h
 
+- name: install python3-systemd
+  apt:
+    name: python3-systemd
+    cache_valid_time: 86400  # 24h
+
+- name: get vault_ha_active_node.py
+  get_url:
+    url: https://raw.githubusercontent.com/madrisan/keepalived-vault-ha/master/vault_ha_active_node.py
+    dest: /etc/keepalived/vault_ha_active_node.py
+    mode: 0755
+
+# https://github.com/madrisan/keepalived-vault-ha/blob/master/README.md
 - name: create /etc/keepalived/keepalived.conf
   template:
     src: keepalived.conf.j2

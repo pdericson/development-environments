@@ -1,11 +1,22 @@
 global_defs {
+    script_user root
+    enable_script_security
+}
+
+vrrp_script vault_active_node_script {
+    script       "/etc/keepalived/vault_ha_active_node.py --timeout=1 --url='https://127.0.0.1:8200'"
+    interval 1   # Run script every 2 seconds
+    fall 1       # If script returns non-zero 2 times in succession, enter FAULT state
+    rise 1       # If script returns zero r times in succession, exit FAULT state
+    timeout 1    # Wait up to t seconds for script before assuming non-zero exit code
+    weight 10    # Reduce priority by 10 on fall
 }
 
 vrrp_instance VI_1 {
     state {{ keepalived_state }}
     interface eth1
     virtual_router_id {{ keepalived_virtual_router_id }}
-    priority {{ keepalived_priority }}
+    priority 100  # {{ keepalived_priority }}
     advert_int 1
     authentication {
         auth_type PASS
@@ -15,5 +26,8 @@ vrrp_instance VI_1 {
 {% for ipaddress in keepalived_virtual_ipaddress %}
         {{ ipaddress }}
 {% endfor %}
+    }
+    track_script {
+        vault_active_node_script
     }
 }
