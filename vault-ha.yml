@@ -1,5 +1,111 @@
 ---
-- hosts: vault-1,vault-2,vault-3
+- hosts: vault
   roles:
     - keepalived
+
+- hosts: vault-1
+  tasks:
+    - include_role:
+        name: easy-rsa
+
+    - name: fetch ca.crt
+      fetch:
+        src: /usr/share/easy-rsa/pki/ca.crt
+        dest: .
+
+- hosts: vault
+  tasks:
+    - name: copy ca.crt
+      copy:
+        src: vault-1/usr/share/easy-rsa/pki/ca.crt
+        dest: /usr/local/share/ca-certificates/Easy-RSA-CA.crt
+
+    - name: update-ca-certificates
+      shell: |
+        update-ca-certificates
+
+    - name: create key
+      shell: |
+        openssl genrsa -out {{ inventory_hostname }}.key
+      args:
+        chdir: /root
+        creates: "{{ inventory_hostname }}.key"
+
+    - name: create req
+      shell: |
+        openssl req -new -key {{ inventory_hostname }}.key -out {{ inventory_hostname }}.req -subj "/C=NZ/ST=Wellington/L=Wellington/O=pdericson/OU=pdericson/CN={{ inventory_hostname }}" -addext "subjectAltName = IP:127.0.0.1, IP:{{ ansible_eth1.ipv4.address }}"
+      args:
+        chdir: /root
+        creates: "{{ inventory_hostname }}.req"
+
+    - name: fetch req
+      fetch:
+        src: /root/{{ inventory_hostname }}.req
+        dest: .
+
+- hosts: vault-1
+  tasks:
+    - name: copy req
+      copy:
+        src: "{{ item }}/root/{{ item }}.req"
+        dest: /root/{{ item }}.req
+      with_items: "{{ groups['vault'] }}"
+
+    - name: easyrsa import-req
+      shell: |
+        ./easyrsa import-req /root/{{ item }}.req {{ item }}
+      args:
+        chdir: /usr/share/easy-rsa
+        creates: pki/reqs/{{ item }}.req
+      with_items: "{{ groups['vault'] }}"
+
+    - name: easyrsa sign-req
+      shell: |
+        ./easyrsa --batch sign-req server {{ item }}
+      args:
+        chdir: /usr/share/easy-rsa
+        creates: pki/issued/{{ item }}.crt
+      with_items: "{{ groups['vault'] }}"
+
+    - name: fetch crt
+      fetch:
+        src: /usr/share/easy-rsa/pki/issued/{{ item }}.crt
+        dest: .
+      with_items: "{{ groups['vault'] }}"
+
+- hosts: vault
+  roles:
     - vault-ha
+
+- hosts: vault
+  tasks:
+    - name: copy crt
+      copy:
+        src: vault-1/usr/share/easy-rsa/pki/issued/{{ inventory_hostname }}.crt
+        dest: /root/{{ inventory_hostname }}.crt
+
+    - name: overwrite tls.crt
+      copy:
+        src: /root/{{ inventory_hostname }}.crt
+        dest: /opt/vault/tls/tls.crt
+        remote_src: true
+        owner: vault
+        group: vault
+        mode: 0700
+      # notify: restart vault
+
+    - name: overwrite tls.key
+      copy:
+        src: /root/{{ inventory_hostname }}.key
+        dest: /opt/vault/tls/tls.key
+        remote_src: true
+        owner: vault
+        group: vault
+        mode: 0700
+      # notify: restart vault
+
+    # XXX
+    - name: restart vault
+      systemd:
+        name: vault
+        state: restarted

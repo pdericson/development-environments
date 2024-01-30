@@ -243,12 +243,20 @@ vault operator raft list-peers
 vagrant ssh vault-2
 
 ```
+vault operator raft join https://192.168.50.101:8200
+
+vault operator unseal  # Use "Unseal Key 1"
+
 # ...
 ```
 
 vagrant ssh vault-3
 
 ```
+vault operator raft join https://192.168.50.101:8200
+
+vault operator unseal  # Use "Unseal Key 1"
+
 # ...
 ```
 

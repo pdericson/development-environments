@@ -1,0 +1,25 @@
+---
+- name: install easy-rsa
+  apt:
+    name: easy-rsa
+    cache_valid_time: 86400  # 24h
+
+- name: easyrsa init-pki
+  shell: |
+    ./easyrsa init-pki
+  args:
+    chdir: /usr/share/easy-rsa
+    creates: pki
+
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-and-configure-a-certificate-authority-ca-on-debian-11
+- name: create vars
+  template:
+    src: vars.j2
+    dest: /usr/share/easy-rsa/vars
+
+- name: easyrsa build-ca
+  shell: |
+    ./easyrsa --batch build-ca nopass
+  args:
+    chdir: /usr/share/easy-rsa
+    creates: pki/ca.crt
