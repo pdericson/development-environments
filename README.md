@@ -252,6 +252,17 @@ vault operator raft join https://192.168.50.101:8200
 vault operator unseal  # Use "Unseal Key 1" from vault-1
 ```
 
+### Test 1
+
+```
+watch 'curl -sS -k https://192.168.50.201:8200/v1/sys/health | jq'
+```
+
+```
+vagrant reload vault-1
+```
+
+
 ```
 vagrant destroy -f vault-{1,2,3}
 ```
