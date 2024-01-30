@@ -262,6 +262,10 @@ watch 'curl -sS -k https://192.168.50.201:8200/v1/sys/health | jq'
 vagrant reload vault-1
 ```
 
+### Test 2
+
+TODO Playbook to restart nodes, prompt for Unseal Key
+
 
 ```
 vagrant destroy -f vault-{1,2,3}
