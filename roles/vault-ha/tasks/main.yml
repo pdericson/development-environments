@@ -20,6 +20,26 @@
     dest: /etc/vault.d/vault.hcl
   notify: restart vault
 
+- name: overwrite tls.crt
+  copy:
+    src: /root/{{ inventory_hostname }}.crt
+    dest: /opt/vault/tls/tls.crt
+    remote_src: true
+    owner: vault
+    group: vault
+    mode: 0700
+  notify: restart vault
+
+- name: overwrite tls.key
+  copy:
+    src: /root/{{ inventory_hostname }}.key
+    dest: /opt/vault/tls/tls.key
+    remote_src: true
+    owner: vault
+    group: vault
+    mode: 0700
+  notify: restart vault
+
 - name: start vault
   systemd:
     name: vault

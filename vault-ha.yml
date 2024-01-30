@@ -74,38 +74,12 @@
       with_items: "{{ groups['vault'] }}"
 
 - hosts: vault
-  roles:
-    - vault-ha
-
-- hosts: vault
   tasks:
     - name: copy crt
       copy:
         src: vault-1/usr/share/easy-rsa/pki/issued/{{ inventory_hostname }}.crt
         dest: /root/{{ inventory_hostname }}.crt
 
-    - name: overwrite tls.crt
-      copy:
-        src: /root/{{ inventory_hostname }}.crt
-        dest: /opt/vault/tls/tls.crt
-        remote_src: true
-        owner: vault
-        group: vault
-        mode: 0700
-      # notify: restart vault
-
-    - name: overwrite tls.key
-      copy:
-        src: /root/{{ inventory_hostname }}.key
-        dest: /opt/vault/tls/tls.key
-        remote_src: true
-        owner: vault
-        group: vault
-        mode: 0700
-      # notify: restart vault
-
-    # XXX
-    - name: restart vault
-      systemd:
-        name: vault
-        state: restarted
+- hosts: vault
+  roles:
+    - vault-ha

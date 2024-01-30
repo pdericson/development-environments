@@ -215,14 +215,10 @@ vault operator unseal  # Use "Unseal Key 1"
 vault login  # Use "Initial Root Token"
 ```
 
-## Vault HA - WIP
-
-Work in progress, this isn't working yet!
+## Vault HA
 
 ```
-vagrant up vault-1
-vagrant up vault-2
-vagrant up vault-3
+vagrant up vault-{1,2,3}
 ansible-playbook -b vault-ha.yml
 ```
 
@@ -237,7 +233,7 @@ vault operator unseal  # Use "Unseal Key 1"
 
 vault login  # Use "Initial Root Token"
 
-vault operator raft list-peers
+watch vault operator raft list-peers
 ```
 
 vagrant ssh vault-2
@@ -245,9 +241,7 @@ vagrant ssh vault-2
 ```
 vault operator raft join https://192.168.50.101:8200
 
-vault operator unseal  # Use "Unseal Key 1"
-
-# ...
+vault operator unseal  # Use "Unseal Key 1" from vault-1
 ```
 
 vagrant ssh vault-3
@@ -255,15 +249,11 @@ vagrant ssh vault-3
 ```
 vault operator raft join https://192.168.50.101:8200
 
-vault operator unseal  # Use "Unseal Key 1"
-
-# ...
+vault operator unseal  # Use "Unseal Key 1" from vault-1
 ```
 
 ```
-vagrant destroy -f vault-1
-vagrant destroy -f vault-2
-vagrant destroy -f vault-3
+vagrant destroy -f vault-{1,2,3}
 ```
 
 ## StackGres
