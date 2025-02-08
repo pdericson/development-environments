@@ -111,4 +111,12 @@ Vagrant.configure("2") do |config|
       machine.vm.network "private_network", ip: "192.168.50.10#{i}"
     end
   end
+  # RHEL 8
+  config.vm.define "rhel8", autostart: false do |machine|
+    machine.vm.box = "generic/rhel8"
+    machine.vm.hostname = "rhel8"
+    machine.vm.provision "ansible" do |ansible|
+      ansible.playbook = "site.yml"
+    end
+  end
 end

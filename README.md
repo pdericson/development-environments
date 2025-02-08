@@ -16,6 +16,7 @@ vagrant up debian-buster-3
 vagrant up debian-bullseye-1
 vagrant up debian-bullseye-2
 vagrant up debian-bullseye-3
+vagrant up rhel8
 ```
 
 ```
@@ -32,6 +33,7 @@ vagrant ssh debian-buster-3
 vagrant ssh debian-bullseye-1
 vagrant ssh debian-bullseye-2
 vagrant ssh debian-bullseye-3
+vagrant ssh rhel8
 ```
 
 ```
@@ -41,6 +43,21 @@ ansible-playbook site.yml
 ```
 vagrant destroy -f
 ```
+
+### Special instructions for RHEL 8
+
+https://access.redhat.com/management/subscriptions
+
+Check that you have a "Red Hat Developer Subscription for Individuals" subscription
+
+```
+sudo subscription-manager register
+```
+
+References:
+
+- [How do I get the no-cost Red Hat Enterprise Linux Developer Subscription or renew it?](https://access.redhat.com/solutions/4078831)
+
 
 ## PostgreSQL
 
@@ -517,4 +534,40 @@ vagrant destroy -f debian-bullseye-1
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
+```
+
+
+## OMD-Labs
+
+https://omd.consol.de/docs/omd/
+
+```
+ansible-playbook omd-labs.yml
+```
+
+https://omd.consol.de/docs/omd/getting_started/
+
+Terminal 1:
+
+vagrant ssh ...
+
+```
+sudo omd create demosite
+```
+
+```
+sudo su - demosite
+```
+
+```
+#set_admin_password
+omd config set PROMETHEUS on
+omd start
+```
+
+Terminal 2:
+
+```
+open https://$(vagrant ssh-config rhel8 | grep HostName | awk '{print $2}')/demosite/
+open https://$(vagrant ssh-config rhel8 | grep HostName | awk '{print $2}')/demosite/prometheus/
 ```

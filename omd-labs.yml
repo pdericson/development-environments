@@ -1,0 +1,28 @@
+---
+- hosts: rhel8
+  tasks:
+    # https://labs.consol.de/repo/stable/#_8
+    - name: Install labs-consol-stable
+      shell: |
+        rpm -Uvh https://labs.consol.de/repo/stable/rhel8/i386/labs-consol-stable.rhel8.noarch.rpm
+      args:
+        creates: /etc/yum.repos.d/labs-consol-stable.repo
+      become: true
+
+    # Workaround "nothing provides perl(Digest::SHA1)"
+    - name: Enable codeready-builder-for-rhel-8-x86_64-rpms
+      shell: |
+        subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+      become: true
+
+    - name: Install omd
+      dnf:
+        name: omd
+      become: true
+
+    - ansible.posix.firewalld:
+        service: https
+        state: enabled
+        permanent: true
+        immediate: true
+      become: true
