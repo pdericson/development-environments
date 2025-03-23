@@ -571,3 +571,24 @@ Terminal 2:
 open https://$(vagrant ssh-config rhel8 | grep HostName | awk '{print $2}')/demosite/
 open https://$(vagrant ssh-config rhel8 | grep HostName | awk '{print $2}')/demosite/prometheus/
 ```
+
+
+## Promxy
+
+https://github.com/jacksontj/promxy/blob/master/README.md#quickstart
+
+
+```
+# TODO
+```
+
+## Neo4j
+
+- https://neo4j.com/deployment-center/?ref=subscription#community
+- https://hub.docker.com/_/neo4j/
+
+```
+docker run -d --name neo4j -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data neo4j
+```
+
+http://localhost:7474/
