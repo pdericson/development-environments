@@ -633,3 +633,122 @@ docker run -d --name neo4j -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data n
 ```
 
 http://localhost:7474/
+
+
+## pgai
+
+https://github.com/timescale/pgai/blob/released/README.md
+
+Note: vectorizer-worker needed a lot of memory for my use case so I decided to use the host operating system.
+
+On Debian 12
+
+### Step 1
+
+https://github.com/timescale/pgai/blob/released/examples/docker_compose_pgai_ollama/docker-compose.yml
+
+```sh
+diff -u docker-compose.yml.orig docker-compose.yml
+```
+
+```diff
+--- docker-compose.yml.orig	2025-04-14 10:37:27.359316610 +1200
++++ docker-compose.yml	2025-04-15 17:08:24.035287955 +1200
+@@ -1,4 +1,3 @@
+-name: pgai
+ services:
+   db:
+     image: timescale/timescaledb-ha:pg17
+@@ -7,15 +6,15 @@
+     ports:
+       - "5432:5432"
+     volumes:
+-      - data:/home/postgres/pgdata/data
++      - /path/to/postgresql-data:/home/postgres/pgdata/data
+     command: [ "-c", "ai.ollama_host=http://ollama:11434" ]
+   vectorizer-worker:
+     image: timescale/pgai-vectorizer-worker:latest
+     environment:
+       PGAI_VECTORIZER_WORKER_DB_URL: postgres://postgres:postgres@db:5432/postgres
+-      OLLAMA_HOST: http://ollama:11434
++      # OLLAMA_HOST: http://ollama:11434
++      OLLAMA_HOST: http://<IP_ADDRESS_OF_DOCKER0>:11435
+     command: [ "--poll-interval", "5s", "--log-level", "DEBUG" ]
+   ollama:
+     image: ollama/ollama
+-volumes:
+-  data:
+```
+
+Optional: Override `OLLAMA_HOST` in vectorizer-worker.
+
+
+```sh
+mkdir /path/to/postgresql-data
+#sudo chown -R 1000:1000 /path/to/postgresql-data
+
+docker-compose up -d
+```
+
+
+### Step 2
+
+```sh
+psql -h localhost -U postgres
+```
+
+```sql
+CREATE TABLE ... (
+    ...
+);
+```
+
+```sql
+CREATE EXTENSION IF NOT EXISTS ai CASCADE;
+```
+
+
+### Step 3
+
+_Import data..._
+
+
+### Step 4
+
+https://my.vultr.com/
+
+https://ollama.com/download
+
+vcg-a100-1c-6g-4vram
+
+Terminal 1:
+
+```
+curl -fsSL https://ollama.com/install.sh | sh
+
+ollama pull nomic-embed-text
+
+watch nvidia-smi
+```
+
+Terminal 2:
+
+```
+ip=...
+while true; do ssh -N -L $(ip addr show docker0 | awk '/inet / {print $2}'):11435:127.0.0.1:11434 root@$ip; sleep 10; done
+```
+
+
+### Step 5
+
+https://github.com/timescale/pgai/blob/released/docs/vectorizer/overview.md
+
+```sh
+docker exec pc_ollama_1 ollama pull nomic-embed-text
+```
+
+```sql
+SELECT ai.create_vectorizer(
+     ...
+);
+```
