@@ -119,4 +119,19 @@ Vagrant.configure("2") do |config|
       ansible.playbook = "site.yml"
     end
   end
+  # Debian 12
+  (1..2).each do |i|
+    config.vm.define "debian-bookworm-#{i}", autostart: false do |machine|
+      machine.vm.box = "debian/bookworm64"
+      machine.vm.hostname = "debian-bookworm-#{i}"
+      machine.vm.provider :libvirt do |domain|
+        domain.cpus = 2
+        domain.memory = 4096
+      end
+      machine.vm.provision "ansible" do |ansible|
+        ansible.playbook = "site.yml"
+      end
+      machine.vm.synced_folder './', '/vagrant', type: 'rsync'
+    end
+  end
 end

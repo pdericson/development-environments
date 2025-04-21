@@ -1,5 +1,5 @@
 ---
-- hosts: debian-bullseye-1
+- hosts: debian-bullseye-1,debian-bookworm-1,debian-bookworm-2
   serial: 1
   roles:
     - vault

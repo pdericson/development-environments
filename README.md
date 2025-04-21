@@ -17,6 +17,8 @@ vagrant up debian-bullseye-1
 vagrant up debian-bullseye-2
 vagrant up debian-bullseye-3
 vagrant up rhel8
+vagrant up debian-bookworm-1
+vagrant up debian-bookworm-2
 ```
 
 ```
@@ -34,6 +36,8 @@ vagrant ssh debian-bullseye-1
 vagrant ssh debian-bullseye-2
 vagrant ssh debian-bullseye-3
 vagrant ssh rhel8
+vagrant ssh debian-bookworm-1
+vagrant ssh debian-bookworm-2
 ```
 
 ```
@@ -231,6 +235,43 @@ vault operator unseal  # Use "Unseal Key 1"
 
 vault login  # Use "Initial Root Token"
 ```
+
+### Medusa
+
+https://github.com/jonasvinther/medusa
+
+```
+#sudo apt install curl
+
+# https://github.com/jonasvinther/medusa/releases
+v=0.7.3
+
+curl -L https://github.com/jonasvinther/medusa/releases/download/v${v}/medusa_${v}_linux_amd64.tar.gz | sudo tar zxvf - -C /usr/local/bin medusa
+```
+
+```
+ip1=
+ip2=
+
+read -s token1
+read -s token2
+
+export VAULT_SKIP_VERIFY=1
+export VAULT_TOKEN="$token1"
+
+vault secrets enable -path=foo1 -version=2 kv
+VAULT_ADDR="https://$ip2:8200" VAULT_TOKEN="$token2" vault secrets enable -path=foo1 -version=2 kv
+
+vault kv put foo1/test1 abc=def
+
+./medusa export foo1 --address="https://$ip1:8200" --token="$token1" --format="json" --insecure
+./medusa export foo1 --address="https://$ip1:8200" --token="$token1" --format="json" --insecure | ./medusa import foo1 - --address="https://$ip2:8200" --token="$token2" --insecure
+
+vault kv put foo1/test1 abc=xyz
+
+# A new version is created regardless of the value.
+```
+
 
 ## Vault HA
 
